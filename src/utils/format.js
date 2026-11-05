@@ -1,0 +1,1 @@
+﻿export const money = (n) => new Intl.NumberFormat("ru-RU").format(n) + " ₽";

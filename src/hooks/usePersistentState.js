@@ -9,12 +9,12 @@ function load(key, fallback) {
     }
 }
 
-export function usePersistentState(key, initial) {
+export function usePersistentState(key, initial, validate = (v) => v) {
     const [value, setValue] = useState(initial);
     const [ready, setReady] = useState(false);
 
     useEffect(() => {
-        setValue(load(key, initial));
+        setValue(validate(load(key, initial)));
         setReady(true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [key]);
@@ -24,6 +24,7 @@ export function usePersistentState(key, initial) {
         try {
             localStorage.setItem(key, JSON.stringify(value));
         } catch {
+
         }
     }, [key, value, ready]);
 

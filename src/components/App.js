@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect } from "react";
+import { useEffect, useState, useCallback } from "react";
 import "@/app/styles.css";
 
 import { CART_KEY, FILTERS_KEY, THEME_KEY, DEFAULT_FILTERS } from "@/constants/config";
@@ -13,11 +13,15 @@ import { sanitizeCart, sanitizeFilters, sanitizeTheme } from "@/utils/sanitize";
 import Filters from "./Filters";
 import ProductList from "./ProductList";
 import Cart from "./Cart";
+import ProductModal from "./ProductModal";
 
 export default function App() {
     const [cart, setCart] = usePersistentState(CART_KEY, [], sanitizeCart);
     const [filters, setFilters] = usePersistentState(FILTERS_KEY, DEFAULT_FILTERS, sanitizeFilters);
     const [theme, setTheme] = usePersistentState(THEME_KEY, "dark", sanitizeTheme);
+
+    const [activeProductId, setActiveProductId] = useState(null);
+    const closeModal = useCallback(() => setActiveProductId(null), []);
 
     useEffect(() => {
         document.documentElement.dataset.theme = theme;
@@ -26,6 +30,7 @@ export default function App() {
     const visible = filterProducts(getProducts(), filters);
     const cartItems = getCartItems(cart);
     const total = cartTotal(cartItems);
+    const qtyMap = cartQtyMap(cart);
 
     return (
         <div className="app">
@@ -48,8 +53,9 @@ export default function App() {
                 <main className="catalog">
                     <ProductList
                         products={visible}
-                        cartQty={cartQtyMap(cart)}
+                        cartQty={qtyMap}
                         onAdd={(id) => setCart((prev) => addItem(prev, id))}
+                        onOpen={setActiveProductId}
                     />
                 </main>
                 <Cart
@@ -61,6 +67,13 @@ export default function App() {
                     onExport={(format) => exportOrder(cartItems, total, format)}
                 />
             </div>
+
+            <ProductModal
+                productId={activeProductId}
+                inCart={activeProductId != null ? qtyMap[activeProductId] : undefined}
+                onClose={closeModal}
+                onAdd={(id) => setCart((prev) => addItem(prev, id))}
+            />
         </div>
     );
 }

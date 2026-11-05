@@ -1,6 +1,6 @@
 ﻿import ProductCard from "./ProductCard";
 
-export default function ProductList({ products, cartQty, onAdd }) {
+export default function ProductList({ products, cartQty, onAdd, onOpen }) {
     if (!products.length) {
         return (
             <p className="empty">
@@ -11,7 +11,13 @@ export default function ProductList({ products, cartQty, onAdd }) {
     return (
         <div className="grid" aria-label="Список товаров">
             {products.map((p) => (
-                <ProductCard key={p.id} product={p} inCart={cartQty[p.id]} onAdd={onAdd} />
+                <ProductCard
+                    key={p.id}
+                    product={p}
+                    inCart={cartQty[p.id]}
+                    onAdd={onAdd}
+                    onOpen={onOpen}
+                />
             ))}
         </div>
     );
